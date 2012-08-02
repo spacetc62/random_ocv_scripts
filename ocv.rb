@@ -10,16 +10,15 @@ require 'mechanize'
 
 FILE_LIST = { 
   :SW => {
-    :majestic => "majesticfreshindex/F-SW-majestic.csv",
-    :ose => "OSE/Sunglasses Warehouse OSE.csv",
-    :wmt => "WMT/All_Links_sunglasswarehouse_com_20120419T164753Z.csv",
-    :wmt_www => "WMT/2_All_Links_www_sunglasswarehouse_com_20120419T164548Z.csv",
+    :majestic => "/Users/mkuehl/Dropbox/Link Data/MASTER LINK LISTS/August Data Pulls/Majestic - SW.csv",
+    :ose => "/Users/mkuehl/Dropbox/Link Data/MASTER LINK LISTS/August Data Pulls/OSE-Sunglass Warehouse.csv",
+    :wmt => "/Users/mkuehl/Dropbox/Link Data/MASTER LINK LISTS/August Data Pulls/GWT - All_Links_www_sunglasswarehouse_com_20120801T162520Z.csv",
     :regexp => /sunglasswarehouse/i
   },
   :RGS => {
-    :majestic => "/Users/mkuehl/Dropbox/Link Data/Backlink lists/RGS 2nd time/majestic.csv",
-    :ose => "/Users/mkuehl/Dropbox/Link Data/Backlink lists/RGS 2nd time/OSE.csv",
-    :wmt => "/Users/mkuehl/Dropbox/Link Data/Backlink lists/RGS 2nd time/webmastertools.csv",
+    :majestic => "/Users/mkuehl/Dropbox/Link Data/MASTER LINK LISTS/August Data Pulls/Majestic - RGS.csv",
+    :ose => "/Users/mkuehl/Dropbox/Link Data/MASTER LINK LISTS/August Data Pulls/OSE-Reading Glasses Shopper.csv",
+    :wmt => "/Users/mkuehl/Dropbox/Link Data/MASTER LINK LISTS/August Data Pulls/GWT - All_Links_www_readingglassesshopper_com_20120801T163056Z.csv",
     :regexp => /readingglassesshopper/i
   },
   :TFS => {
@@ -63,12 +62,12 @@ class Hash
   end
 end
 
-STORE_TO_RUN = :RGS
+STORE_TO_RUN = :SW
 
 master_set = { }
 
 master_headers = ["Target URL", "Source URL", "Source ACRank", "DA", "Anchor Text",
-                  "Source First Found Date", "FlagNoFollow", "Link Check", "Redirected To"]
+                  "Source First Found Date", "Link Check", "Redirected To"]
 
 conversions = { "\357\273\277SourceURL" => "Source URL",
   "SourceURL" => "Source URL",
@@ -116,28 +115,14 @@ FasterCSV.foreach(FILE_LIST[STORE_TO_RUN][:wmt], :headers => true) do |row|
   url = PostRank::URI.clean(row["Links"])
   match = master_set[url]
   if match
+    match["Source First Found Date"] = row["Date"]
     match_count += 1
   else
-    master_set[url] = { "Source URL" => url }
+    master_set[url] = { "Source URL" => url, "Source First Found Date" => row["Date"] }
   end
 end
 puts "Plus WMT: #{master_set.size}"
 puts "WMT Match: #{match_count}"
-
-if FILE_LIST[STORE_TO_RUN][:wmt_www]
-  match_count = 0
-  FasterCSV.foreach(FILE_LIST[STORE_TO_RUN][:wmt_www], :headers => true) do |row|
-    url = PostRank::URI.clean(row["Links"])
-    match = master_set[url]
-    if match
-      match_count += 1
-    else
-      master_set[url] = { "Source URL" => url }
-    end
-  end
-  puts "Plus WMT www: #{master_set.size}"
-  puts "WMT www Match: #{match_count}"
-end
 
 to_check = master_set.keys.to_a
  

@@ -7,7 +7,7 @@ require 'andand'
 require 'domainatrix'
 require 'postrank-uri'
 
-stores = ["HH"]
+stores = ["TP"]
 
 root_path = "/Users/mkuehl/Dropbox/Link Data/MASTER LINK LISTS/"
 
@@ -20,13 +20,13 @@ stores.each do |store|
     csv << ["Domain", "Admin Contact Name", "Admin Contact Organization", "Admin Contact Email",
             "Registrant Contact Name", "Registrant Contact Organization", "Registrant Contact Email",
             "Technical Contact Name", "Technical Contact Organization", "Technical Contact Email"]
-    FasterCSV.foreach("#{root_path}/#{store}_domains.csv", :headers => true) do |row|
+    FasterCSV.foreach("TP_output.csv", :headers => true) do |row|
       domain = nil
       begin
-        r = Domainatrix.parse(PostRank::URI.clean(row["Domain"]))
+        r = Domainatrix.parse(PostRank::URI.clean(row["URL"]))
         domain = "#{r.domain}.#{r.public_suffix}"
       rescue
-        domain = row["Domain"]
+        domain = row["URL"]
       end
       next unless domain
       
@@ -44,7 +44,7 @@ stores.each do |store|
           domains[domain] = []
         end
       end
-      csv << [row["Domain"]] + domains[domain]      
+      csv << [row["URL"]] + domains[domain]      
       puts "#{store}: #{domain}"
     end
     sleep 5
